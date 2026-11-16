@@ -116,7 +116,51 @@ const char* BallisticDemo::getTitle()
 
 void BallisticDemo::fire()
 {
-    
+    AmmoRound* shot;
+    for (shot = ammo; shot < ammo + ammoRounds; shot++)
+    {
+        if (shot->type == UNUSED) break;
+    }
+
+    // If we didn't find a round, then exit - we can't fire.
+    if (shot >= ammo + ammoRounds) return;
+
+    // Set the properties of the particle
+    switch (currentShotType)
+    {
+    case PISTOL:
+        shot->particle.setMass(2.0f);
+        shot->particle.setVelocity(0.0f, 0.0f, 35.0f);
+        shot->particle.setAcceleration(0.0f, -1.0f, 0.0f);
+        shot->particle.setDamping(0.99f);
+        break;
+
+    case ARTILLERY:
+        shot->particle.setMass(200.0f);
+        shot->particle.setVelocity(0.0f, 30.0f, 40.0f);
+        shot->particle.setAcceleration(0.0f, -20.0f, 0.0f);
+        shot->particle.setDamping(0.99f);
+        break;
+
+    case FIREBALL:
+        shot->particle.setMass(1.0f);
+        shot->particle.setVelocity(0.0f, 0.0f, 10.0f);
+        shot->particle.setAcceleration(0.0f, 0.6f, 0.0f);
+        shot->particle.setDamping(0.90f);
+        break;
+
+    case LASER:
+        shot->particle.setMass(0.1f);
+        shot->particle.setVelocity(0.0f, 0.0f, 100.0f);
+        shot->particle.setAcceleration(0.0f, 0.0f, 0.0f);
+        shot->particle.setDamping(0.99f);
+        break;
+
+    case UNUSED:
+        break;
+    }
+
+    shot->type = currentShotType;
 }
 
 void BallisticDemo::update()
@@ -124,10 +168,11 @@ void BallisticDemo::update()
     // Find the duration of the last frame in seconds
     float duration = (float)TimingData::get().lastFrameDuration * 0.001f;
     if (duration <= 0.0f) return;
+    AmmoRound* shot = ammo;
+    shot->particle.integrate(duration);
+    shot->startTime;
 
     
-
-
 
     Application::update();
 }

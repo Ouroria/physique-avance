@@ -29,7 +29,13 @@ void Particle::integrate(real duration)
 
     assert(duration > 0.0);
 
-    
+    position = position + velocity * duration;
+
+    Vector3 resultingAcc = acceleration + forceAccum * inverseMass;
+
+    velocity = velocity + resultingAcc * duration;
+
+    velocity = velocity * damping;
 
 
 
