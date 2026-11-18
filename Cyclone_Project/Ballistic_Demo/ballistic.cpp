@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 #include <cyclone.h>
+#include "pfgen.h"
 #include "ogl_headers.h"
 #include "app.h"
 #include "timing.h"
@@ -78,6 +79,8 @@ class BallisticDemo : public Application
     /** Dispatches a round. */
     void fire();
 
+    cyclone::ParticleGravity GravGen;
+
 public:
     /** Creates a new demo object. */
     BallisticDemo();
@@ -100,13 +103,14 @@ public:
 
 // Method definitions
 BallisticDemo::BallisticDemo()
-: currentShotType(LASER)
+: currentShotType(LASER), GravGen(cyclone::Vector3::GRAVITY)
 {
     // Make all shots unused
     for (AmmoRound *shot = ammo; shot < ammo+ammoRounds; shot++)
     {
         shot->type = UNUSED;
     }
+    
 }
 
 const char* BallisticDemo::getTitle()
@@ -163,6 +167,9 @@ void BallisticDemo::fire()
     shot->particle.setPosition(0.0f, 1.5f, 0.0f);
     shot->type = currentShotType;
     shot->startTime = TimingData::get().frameNumber;
+
+    shot->particle.setAcceleration(cyclone::Vector3());
+    shot->particle.clearAccumulator();
 }
 
 void BallisticDemo::update()
@@ -172,6 +179,7 @@ void BallisticDemo::update()
     if (duration <= 0.0f) return;
     for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
         if (shot->type != UNUSED) {
+            GravGen.updateForce(&shot->particle, duration);
             shot->particle.integrate(duration);
 
             float age = (TimingData::get().frameNumber - shot->startTime) * duration;
