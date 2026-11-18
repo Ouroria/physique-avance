@@ -160,7 +160,9 @@ void BallisticDemo::fire()
         break;
     }
 
+    shot->particle.setPosition(0.0f, 1.5f, 0.0f);
     shot->type = currentShotType;
+    shot->startTime = TimingData::get().frameNumber;
 }
 
 void BallisticDemo::update()
@@ -168,9 +170,20 @@ void BallisticDemo::update()
     // Find the duration of the last frame in seconds
     float duration = (float)TimingData::get().lastFrameDuration * 0.001f;
     if (duration <= 0.0f) return;
-    AmmoRound* shot = ammo;
-    shot->particle.integrate(duration);
-    shot->startTime;
+    for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
+        if (shot->type != UNUSED) {
+            shot->particle.integrate(duration);
+
+            float age = (TimingData::get().frameNumber - shot->startTime) * duration;
+
+            const cyclone::Vector3& position = shot->particle.getPosition();
+
+            if (position.y < 0.0f || age > 5.0f || position.z > 200.0f) {
+
+                shot->type = UNUSED;
+            }
+        }
+    }
 
     
 

@@ -100,12 +100,12 @@ struct FireworkRule
     unsigned payloadCount;
 
     /** The set of payloads. */
-    Payload *payloads;
+    Payload* payloads;
 
     FireworkRule()
-    :
-    payloadCount(0),
-    payloads(NULL)
+        :
+        payloadCount(0),
+        payloads(NULL)
     {
     }
 
@@ -124,7 +124,7 @@ struct FireworkRule
      * Set all the rule parameters in one go.
      */
     void setParameters(unsigned type, cyclone::real minAge, cyclone::real maxAge,
-        const cyclone::Vector3 &minVelocity, const cyclone::Vector3 &maxVelocity,
+        const cyclone::Vector3& minVelocity, const cyclone::Vector3& maxVelocity,
         cyclone::real damping)
     {
         FireworkRule::type = type;
@@ -140,12 +140,35 @@ struct FireworkRule
      * instance. The optional parent firework is used to base position
      * and velocity on.
      */
-    void create(Firework *firework, const Firework *parent = NULL) const
+    void create(Firework* firework, const Firework* parent = NULL) const
     {
-        
 
+        firework->type = type;
+        firework->age = crandom.randomReal(minAge, maxAge);
+        firework->setAcceleration(cyclone::Vector3::GRAVITY);
+        firework->setDamping(damping);
+        firework->setMass(1.0f);
 
+        cyclone::Vector3 position;
+        if (parent) {
+            position = parent->getPosition();
+        }
+        else {
+            int x = crandom.randomInt(3) - 1;
+            position = cyclone::Vector3(x * 5.0f, 0.0f, 0.0f);
+        }
+        firework->setPosition(position);
 
+        cyclone::Vector3 velocity;
+
+        velocity.x = crandom.randomReal(minVelocity.x, maxVelocity.x);
+        velocity.y = crandom.randomReal(minVelocity.y, maxVelocity.y);
+        velocity.z = crandom.randomReal(minVelocity.z, maxVelocity.z);
+
+        if (parent) {
+            velocity += parent->getVelocity();
+        }
+        firework->setVelocity(velocity);
     }
 };
 
@@ -229,13 +252,95 @@ void FireworksDemo::initFireworkRules()
     rules[0].setParameters(
         1, // type
         0.5f, 1.4f, // age range
-        cyclone::Vector3(-5, 25, -5), // min velocity
-        cyclone::Vector3(5, 28, 5), // max velocity
+        cyclone::Vector3(-5, 15, -5), // min velocity
+        cyclone::Vector3(5, 18, 5), // max velocity
         0.1 // damping
-        );
+    );
     rules[0].payloads[0].set(3, 5);
     rules[0].payloads[1].set(5, 5);
 
+
+    rules[1].init(1);
+    rules[1].setParameters(
+        2,
+        0.5f, 1.4f,
+        cyclone::Vector3(-5, 15, -5),
+        cyclone::Vector3(5, 18, 5),
+        0.1
+    );
+    rules[1].payloads[0].set(4, 2);
+
+
+    rules[2].init(0);
+    rules[2].setParameters(
+        3,
+        0.5f, 1.4f,
+        cyclone::Vector3(-5, 15, -5),
+        cyclone::Vector3(5, 18, 5),
+        0.1
+    );
+
+
+    rules[3].init(0);
+    rules[3].setParameters(
+        4,
+        0.5f, 1.4f,
+        cyclone::Vector3(-5, 15, -5),
+        cyclone::Vector3(5, 18, 5),
+        0.1
+    );
+
+
+    rules[4].init(1);
+    rules[4].setParameters(
+        5,
+        0.5f, 1.4f,
+        cyclone::Vector3(-5, 15, -5),
+        cyclone::Vector3(5, 18, 5),
+        0.1
+    );
+    rules[4].payloads[0].set(3, 5);
+
+
+    rules[5].init(0);
+    rules[5].setParameters(
+        6,
+        1.5f, 2.4f,
+        cyclone::Vector3(-5, 15, -5),
+        cyclone::Vector3(5, 18, 5),
+        0.1
+    );
+
+
+    rules[6].init(1);
+    rules[6].setParameters(
+        7,
+        0.5f, 1.4f,
+        cyclone::Vector3(-5, 20, -5),
+        cyclone::Vector3(5, 23, 5),
+        0.1
+    );
+    rules[6].payloads[0].set(8, 10);
+
+
+    rules[7].init(0);
+    rules[7].setParameters(
+        8,
+        0.1f, 1.1f,
+        cyclone::Vector3(-5, 15, -5),
+        cyclone::Vector3(5, 18, 5),
+        0.1
+    );
+    
+
+    rules[8].init(0);
+    rules[8].setParameters(
+        9,
+        0.5f, 1.4f,
+        cyclone::Vector3(-5, 15, -5),
+        cyclone::Vector3(5, 18, 5),
+        0.1
+    );
     // ... and so on for other firework types ...
 }
 

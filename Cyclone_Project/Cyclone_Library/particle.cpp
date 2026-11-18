@@ -33,15 +33,9 @@ void Particle::integrate(real duration)
 
     Vector3 resultingAcc = acceleration + forceAccum * inverseMass;
 
-    velocity = velocity + resultingAcc * duration;
+    Vector3 resultingVelo = velocity + resultingAcc * duration;
 
-    velocity = velocity * damping;
-
-
-
-
-
-
+    velocity = resultingVelo * pow(damping, duration);
 
     // Clear the forces.
     clearAccumulator();
@@ -162,4 +156,5 @@ void Particle::clearAccumulator()
 
 void Particle::addForce(const Vector3 &force)
 {
+    forceAccum += force;
 }

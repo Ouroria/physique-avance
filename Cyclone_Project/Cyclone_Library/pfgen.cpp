@@ -39,7 +39,11 @@ ParticleGravity::ParticleGravity(const Vector3& gravity)
 
 void ParticleGravity::updateForce(Particle* particle, real duration)
 {
-    
+    if (particle->hasFiniteMass()) {
+        cyclone::Vector3 force;
+        force = gravity * particle->getMass();
+        particle->addForce(force);
+    }
 
 
 }
@@ -51,7 +55,17 @@ ParticleDrag::ParticleDrag(real k1, real k2)
 
 void ParticleDrag::updateForce(Particle* particle, real duration)
 {
-    
+    cyclone::Vector3 velocity = particle->getVelocity();
+    cyclone::Vector3 acceleration = particle->getAcceleration();
+    cyclone::Vector3 speed;
+    speed = velocity + acceleration * duration;
+    cyclone::Vector3 force;
+    if (speed.operator>({ 0,0,0 })) {
+        force.x = (-1 * velocity.x / speed.x) * (k1 * speed.x + k2 * speed.x * speed.x);
+        force.y = (-1 * velocity.y / speed.y) * (k1 * speed.y + k2 * speed.y * speed.y);
+        force.z = (-1 * velocity.z / speed.z) * (k1 * speed.z + k2 * speed.z * speed.z);
+        particle->addForce(force);
+    }
 
 
 }
